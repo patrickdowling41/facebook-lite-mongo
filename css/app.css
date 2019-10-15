@@ -1,0 +1,84 @@
+.home-btn
+{
+    padding-top: 0.3vh;
+    padding-bottom: 0.5vh;
+    color: white;
+}
+
+body
+{
+    background-color: #dfe9ff;
+}
+
+nav
+{
+    background-color: #3c5a99;
+}
+
+.inline
+{
+    display: inline-flex;
+}
+
+.post-btn
+{
+    background-color: white;   
+}
+
+.post-btn:hover
+{
+    background-color: #ebebeb;   
+}
+
+.post-component
+{
+    background-color: white;
+    margin: 0;  
+}
+
+.friend-search-field
+{
+    width: 65vh;
+    margin-top: 2vh;
+    margin-left: 2vh;
+    margin-right: 0;
+    padding-right: 0;
+}
+
+.nav-btn
+{
+    padding: 0.5vh;
+    color: white;
+    margin-top: 1.3vh
+}
+
+.right-align
+{
+    text-align: right;
+}
+
+.friend-search-btn
+{
+    padding-top: 0.1vh;
+    padding-bottom: 0.1vh;
+    padding-left: 1vh;
+    padding-right: 1vh;
+    background-color: white;
+    color: #ababab;
+    text-decoration: none;
+    border: #ababab;
+
+
+}
+
+.friend-search-btn:hover
+{
+    padding-top: 0.1vh;
+    padding-bottom: 0.1vh;
+    padding-left: 1vh;
+    padding-right: 1vh;
+    background-color: #e3e3e3;
+    color: #ababab;
+    text-decoration: none;
+    border: #ababab;
+}
