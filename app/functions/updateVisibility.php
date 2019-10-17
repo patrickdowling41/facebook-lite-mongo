@@ -1,23 +1,22 @@
 <?php
-
-require('../../db_connect.php');
 session_start();
+include_once("../../../app/vendor/autoload.php");
 
 $email = $_SESSION['email'];
-$visibility = strtolower($_POST['visibility']);
+$visibility = $_POST['visibility'];
 
-if (isset($visibility))
+try
 {
-    $updateUser = "UPDATE FACEBOOKUSER
-    SET visibility = :bv_visibility
-    WHERE email like :bv_email";
+    $client = new MongoDB\Client("mongodb://mongo:27017");
 
-    $stid = oci_parse($conn, $updateUser);
+    $collection = $client->Assignment2->FacebookUser;
 
-    oci_bind_by_name($stid, ":bv_email", $email);
-    oci_bind_by_name($stid, ":bv_visibility", $visibility);
-    
-    oci_execute($stid);
+    $result = $collection->updateOne(
+        ['email' => $email],
+        ['$set' => ['visibility' => $visibility]]
+    );
 }
-oci_close($conn);
+catch (MongoDB\Driver\Exception\Exception $e) {
+    $filename = basename(__FILE__);
+}
 header('Location: ../settings.php');
