@@ -1,3 +1,5 @@
+<?php session_start() ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,6 +29,7 @@
 <link rel="stylesheet" type="text/css" href="../css/app.css">
 
 <?php
+include_once("../../app/vendor/autoload.php"); 
 include_once('functions/confirmLoggedIn.php');
 include_once('components/nav.php');
 $email = $_SESSION['email'];
@@ -37,36 +40,35 @@ $count = 0;
     <div class="container">
         <div class="row">
             <?php
-            $getFriendDetails = "SELECT fu.email as email, fu.screenName as screenName, ur.requestID as requestID
-            FROM FACEBOOKUSER fu
-            LEFT JOIN USERREQUEST ur
-            ON ur.email = fu.email
-            WHERE ur.requestID IN
-            (
-                SELECT requestID
-                FROM USERREQUEST
-                WHERE email like :bv_email
-                AND sentOrReceived like 'receiver'
-            )
-            AND ur.EMAIL NOT LIKE :bv_email";
-            $stid = oci_parse($conn, $getFriendDetails);
-            oci_bind_by_name($stid, ":bv_email", $email);
-            oci_execute($stid);
-            while (($row = oci_fetch_array($stid, OCI_ASSOC)) != false)
+
+            try
             {
-                $count++;
-                ?>
-                <!-- form to handle the friend request. will either accept or decline depending on the submission button selected -->
-                <form action="functions/handleFriendRequest.php" method="POST">
+                $client = new MongoDB\Client("mongodb://mongo:27017");
+
+                $collection = $client->Assignment2->FacebookUser;
+                $userDetails = $collection->findOne(array(
+                    'email' => $email,
+                ));
+
+                foreach($userDetails->friendRequests as $friendRequest)
+                {
+                    $count++;
+                    $friendDetails = $collection->findOne(array(
+                        'email' => $friendRequest->email,
+                    ));
+                    // form to handle the friend request. will either accept or decline depending on the submission button selected
+                    echo '<form action="functions/handleFriendRequest.php" method="POST">';
+                        echo '<h3 class="friend-screenName">'.$friendDetails->screenName.'</h3>';
+                        echo '<input class="friend-email" type="hidden" name="friend-email" value="'.$friendDetails->email.'">';
+                        ?>
+                        <button class="btn btn-danger" type="submit" name="task" value="decline">Decline</button>
+                        <button class="btn btn-success" type="submit" name="task" value="accept">Accept</button>
+                    </form> 
                     <?php
-                    echo '<h3 class="friend-screenName">'.$row['SCREENNAME'].'</h3>';
-                    echo '<input class="friend-email" type="hidden" name="friend-email" value="'.$row['EMAIL'].'">';
-                    echo '<input class="friend-requestID" type="hidden" name="friend-requestID" value="'.$row['REQUESTID'].'">';
-                    ?>
-                    <button class="btn btn-danger" type="submit" name="task" value="decline">Decline</button>
-                    <button class="btn btn-success" type="submit" name="task" value="accept">Accept</button>
-                </form> 
-                <?php
+                }
+            }                
+            catch (MongoDB\Driver\Exception\Exception $e) {
+                $filename = basename(__FILE__);
             }
             // only occurs if no friend requests are found
             if ($count == 0)

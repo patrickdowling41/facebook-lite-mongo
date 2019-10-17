@@ -1,3 +1,6 @@
+<?php session_start(); 
+include_once("../../app/vendor/autoload.php"); 
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
