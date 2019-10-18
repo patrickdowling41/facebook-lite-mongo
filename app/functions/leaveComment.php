@@ -1,38 +1,28 @@
 <?php 
-require('../../db_connect.php');
+include_once("../../../app/vendor/autoload.php"); 
 session_start();
 
 $body = $_POST['reply-field'];
 $originalPostID = $_POST['post-id'];
 $email = $_SESSION['email'];
 date_default_timezone_set('Australia/Melbourne');
-$timestamp = date('d-m-y H:i:s');
 
-$reply = "INSERT INTO POST (
-    bodyText,
-    posterEmail,
-    postTime,
-    originalPostID,
-    replyToID
-)
-VALUES
-(
-    :bv_bodyText,
-    :bv_email,
-    TO_DATE(:bv_timestamp, 'dd-mm-yy hh24:mi:ss'),
-    :bv_originalPostID,
-    :bv_originalPostID
-)";
 
-$stid = oci_parse($conn, $reply);
+try {
+    $client = new MongoDB\Client("mongodb://mongo:27017");
 
-oci_bind_by_name($stid, ":bv_bodyText", $body);
-oci_bind_by_name($stid, ":bv_email", $email);
-oci_bind_by_name($stid, ":bv_originalPostID", $originalPostID);
-oci_bind_by_name($stid, ":bv_timestamp", $timestamp);
+    $collection = $client->Assignment2->Post;
+    $insertOneResult = $collection->insertOne([
+        'body' => $body,
+        'posterEmail' => $email,
+        'replyTo' => new MongoDB\BSON\ObjectId("$originalPostID"),
+        'likes' => [],
+        'timestamp' => new MongoDB\BSON\UTCDateTime((new DateTime($today))->getTimestamp()*1000)
+    ]);
+}
+catch (MongoDB\Driver\Exception\Exception $e) {
+    $filename = basename(__FILE__);
+}
 
-oci_execute($stid);
-
-oci_close($conn);
 header('Location: ../index.php');
 ?>

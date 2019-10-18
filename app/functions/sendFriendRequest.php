@@ -23,7 +23,7 @@ function existingFriendship($senderEmail, $friendEmail)
     
         $result = $collection->findOne(
             ['email' => $senderEmail],
-            ['friends' => ['email' => $friendEmail]]
+                ['friends' => ['email' => $friendEmail]]
         ); 
 
         if (isset($result->friends->email))

@@ -7,8 +7,7 @@ include_once('../functions/confirmLoggedIn.php');
 
 $body = $_POST['cp-body'];
 $email = $_SESSION['email'];
-
-$timestamp = Date("<YYYY-mm-ddTHH:MM:ss>");
+date_default_timezone_set('Australia/Melbourne');
 
 try
 {
@@ -18,7 +17,8 @@ try
     $insertOneResult = $collection->insertOne([
         'body' => $body,
         'posterEmail' => $email,
-        'timestamp' => $timestamp
+        'timestamp' => new MongoDB\BSON\UTCDateTime((new DateTime($today))->getTimestamp()*1000),
+        'likes' => []
     ]);
 }
 catch (MongoDB\Driver\Exception\Exception $e) {

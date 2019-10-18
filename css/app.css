@@ -33,7 +33,9 @@ nav
 .post-component
 {
     background-color: white;
-    margin: 0;  
+    padding:2vh;
+    border-radius: 10px;
+    margin-top: 2vh;
 }
 
 .friend-search-field
@@ -81,4 +83,44 @@ nav
     color: #ababab;
     text-decoration: none;
     border: #ababab;
+}
+
+.like-button 
+{
+    margin-right: 0.5vh;
+    margin-bottom: 2vh;
+    margin-top: 2vh;
+}
+
+.no-of-likes
+{
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+}
+
+.reply-body-wrapper
+{
+    padding: 1vh;
+    border-radius: 15px;
+    background-color: #f7f7f7;
+}
+
+.reply-screenName
+{
+    font-size: 16px;
+}
+
+.post-body
+{
+    margin-top: 1vh;
+}
+
+.post-time
+{
+    color: #ababab;
+}
+
+.indent 
+{
+    margin-left: 3vh;
 }
