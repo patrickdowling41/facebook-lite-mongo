@@ -1,36 +1,29 @@
 <?php 
-require('../../db_connect.php');
 session_start();
 
-include_once('functions/confirmLoggedIn.php');
+include_once("../../../app/vendor/autoload.php");
+
+include_once('../functions/confirmLoggedIn.php');
 
 $body = $_POST['cp-body'];
 $email = $_SESSION['email'];
 date_default_timezone_set('Australia/Melbourne');
-// creates PHP date in format dd/mm/yy hh:mm
-$timeOfPost = date('d-m-y H:i');
 
-$addLike = "INSERT INTO POST (
-    bodyText,
-    posterEmail,
-    postTime
-)
-VALUES
-(
-    :bv_body,
-    :bv_email,
-    TO_DATE(:bv_timeOfPost, 'dd-mm-yy hh24:mi')
-)";
+try
+{
+    $client = new MongoDB\Client("mongodb://mongo:27017");
 
-$stid = oci_parse($conn, $addLike);
-
-oci_bind_by_name($stid, ':bv_body', $body);
-oci_bind_by_name($stid, ':bv_email', $email);
-oci_bind_by_name($stid, ':bv_timeOfPost', $timeOfPost);
-
-oci_execute($stid);
-
-oci_close($conn);
+    $collection = $client->Assignment2->Post;
+    $insertOneResult = $collection->insertOne([
+        'body' => $body,
+        'posterEmail' => $email,
+        'timestamp' => new MongoDB\BSON\UTCDateTime((new DateTime($today))->getTimestamp()*1000),
+        'likes' => []
+    ]);
+}
+catch (MongoDB\Driver\Exception\Exception $e) {
+    $filename = basename(__FILE__);
+}
 
 header("Location: ../index.php");
 

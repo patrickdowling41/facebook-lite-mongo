@@ -35,6 +35,7 @@ catch (MongoDB\Driver\Exception\Exception $e) {
 if ($_SESSION["loggedIn"] === 1)
 {
     // redirects to the app once logged in correctly.
+    $_SESSION['email'] = $email;
     header('Location: ../app');
 }
 else

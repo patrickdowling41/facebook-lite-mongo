@@ -25,6 +25,9 @@
 
 <link rel="stylesheet" type="text/css" href="../css/app.css">
 
+<title>Facebook-lite</title>
+<link rel='shortcut icon' type='image/svg' href='../img/favicon.svg' />
+
 </head>
 
 <?php include_once('components/nav.php'); ?>

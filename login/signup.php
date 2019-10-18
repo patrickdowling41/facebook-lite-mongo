@@ -127,9 +127,14 @@ if (($_SESSION['signupSuccess']))
             'passwordHash' => $passwordHash,
             'firstName' => $firstname,
             'surname' => $surname,
-            'dateOfBirth' => Date($dateOfBirth),
+            'dateOfBirth' => $dateOfBirth,
             'gender' => $gender,
-            'visibility' => 'Private'
+            'screenName' => $firstname . ' ' . $surname,
+            'visibility' => 'Private',
+            // initialise friend arrays
+            'friends' => [],
+            'friendRequests' => [],
+            'friendsInvited' => []
         ]);
     }
     catch (MongoDB\Driver\Exception\Exception $e) {

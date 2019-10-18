@@ -1,3 +1,5 @@
+<?php session_start();?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,72 +25,79 @@
 </head>
 
 <?php
-session_start();
-require('../db_connect.php');
 include_once('components/nav.php');
+include_once("../../app/vendor/autoload.php");
 
 $search = $_POST['friend-search'];
 $userEmail = $_SESSION['email'];
 
 include_once('functions/confirmLoggedIn.php');
 
+$count=0;
+
 // responds all search results matching the screen name or email, not showing the logged in user however
-$searchUser="SELECT fu.email, fu.screenName, l.city, l.country
-FROM FACEBOOKUSER fu
-LEFT JOIN LOCATION l
-ON fu.locationID = l.locationID
-WHERE lower(:bv_userEmail) not like lower(fu.email)
-AND LOWER(:bv_search) like LOWER(fu.screenName) 
-OR LOWER(:bv_search) like LOWER(fu.email)";
+try {
+    
+    $client = new MongoDB\Client("mongodb://mongo:27017");
 
+    $collection = $client->Assignment2->FacebookUser;
 
-$stid = oci_parse($conn, $searchUser);
+    $cursor = $collection->find([
+        '$or' => [
+            ['email' => $search],
+            ['screenName' => $search],
+        ],
+    ]);
+    // display all docs that match the search condition
+    foreach ($cursor as $document) 
+    {
+        $count++;
+        ?>
+        
+        <div class="container">
+            <div class="user-component">
+            <h1>Search Results</h1>
+            <!-- form that displays each user and allows current user to add them as friend -->
+            <form action="functions/sendFriendRequest.php" method="POST">
+                <div class="row">
+                    <div class="col-xs-1">
+                        <i class="far fa-user-circle fa-3x"></i>
+                    </div>
+                    <div class="col-lg-5">
+                        <?php  
+                        echo '<h3 class="search-username">'.$document->screenName.'</h3>';
+                        echo '<p class="search-email">'.$document->email.'</p>';
+                        if(isset($document->location)=== true)
+                        {
+                            echo '<div class="search-location">'.$document->city.', '.$document->country.'</div>';
+                        }
+                        echo '<input name="friend-email" type="hidden" value="'.$document->email.'">';
+                        ?>
+                    </div>
+                    <div class="col-lg-5">
+                        <?php if (strcmp($document->email, $userEmail) === 0)
+                        {
+                            echo '<button type="submit" disabled class="btn btn-light">+ Add Friend</button>';
+                        }
+                        else
+                        {
+                            echo '<button type="submit" class="btn btn-light">+ Add Friend</button>';
+                        }
+                        ?>
+                    </div>
+                </div>
+            </form>
+        </div>
+    <?php
+    }
 
-oci_bind_by_name($stid, ':bv_search', $search);
-oci_bind_by_name($stid, ':bv_userEmail', $userEmail);
-
-oci_execute($stid);
+    if ($count === 0)
+    {
+        echo '<h3 class="text-center">No matching users</h3>';
+    }
+}
+catch (MongoDB\Driver\Exception\Exception $e) {
+    $filename = basename(__FILE__);
+}
 
 ?>
-<body>
-    <div class="container">
-        <div class="user-component">
-            <h1>Search Results</h1>
-            <?php
-            while (($row = oci_fetch_array($stid, OCI_ASSOC)) != false)
-            {
-            ?>
-                <!-- form that displays each user and allows current user to add them as friend -->
-                <form action="functions/sendFriendRequest.php" method="POST">
-                    <div class="row">
-                        <div class="col-xs-1">
-                            <i class="far fa-user-circle fa-3x"></i>
-                        </div>
-                        <div class="col-lg-5">
-                            <?php  
-                            echo '<h3 class="search-username">'.$row['SCREENNAME'].'</h3>';
-                            echo '<p class="search-email">'.$row['EMAIL'].'</p>';
-                            if(isset($row['CITY'])=== true)
-                            {
-                                echo '<div class="search-location">'.$row['CITY'].', '.$row['COUNTRY'].'</div>';
-                            }
-                            echo '<input name="friend-email" type="hidden" value="'.$row['EMAIL'].'">';
-                            ?>
-                        </div>
-                        <div class="col-lg-5">
-                            <button type="submit" class="btn btn-light">+ Add Friend</button>
-                        </div>
-                    </div>
-                </form>
-            <?php
-            }
-            ?>
-        </div>
-    </div>
-</body>
-
-<?php 
-
-oci_close($conn); ?>
-
-
