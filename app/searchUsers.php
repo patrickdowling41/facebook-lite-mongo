@@ -33,6 +33,8 @@ $userEmail = $_SESSION['email'];
 
 include_once('functions/confirmLoggedIn.php');
 
+$count=0;
+
 // responds all search results matching the screen name or email, not showing the logged in user however
 try {
     
@@ -49,7 +51,9 @@ try {
     // display all docs that match the search condition
     foreach ($cursor as $document) 
     {
-    ?>
+        $count++;
+        ?>
+        
         <div class="container">
             <div class="user-component">
             <h1>Search Results</h1>
@@ -71,12 +75,25 @@ try {
                         ?>
                     </div>
                     <div class="col-lg-5">
-                        <button type="submit" class="btn btn-light">+ Add Friend</button>
+                        <?php if (strcmp($document->email, $userEmail) === 0)
+                        {
+                            echo '<button type="submit" disabled class="btn btn-light">+ Add Friend</button>';
+                        }
+                        else
+                        {
+                            echo '<button type="submit" class="btn btn-light">+ Add Friend</button>';
+                        }
+                        ?>
                     </div>
                 </div>
             </form>
         </div>
     <?php
+    }
+
+    if ($count === 0)
+    {
+        echo '<h3 class="text-center">No matching users</h3>';
     }
 }
 catch (MongoDB\Driver\Exception\Exception $e) {

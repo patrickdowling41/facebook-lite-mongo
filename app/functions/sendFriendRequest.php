@@ -23,16 +23,16 @@ function existingFriendship($senderEmail, $friendEmail)
     
         $result = $collection->findOne(
             ['email' => $senderEmail],
-                ['friends' => ['email' => $friendEmail]]
-        ); 
+            ['friends' => ['email' => $friendEmail]]
+        );
 
-        if (isset($result->friends->email))
+        if (isset($result->email))
         {
-            return true;
+            return false;
         }
         else
         {
-            return false;
+            return true;
         }
     }
     catch (MongoDB\Driver\Exception\Exception $e) {

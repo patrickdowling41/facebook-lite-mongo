@@ -28,6 +28,9 @@
 
 <link rel="stylesheet" type="text/css" href="../css/app.css">
 
+<title>Facebook-lite</title>
+<link rel='shortcut icon' type='image/svg' href='../img/favicon.svg' />
+
 <?php
 include_once("../../app/vendor/autoload.php"); 
 include_once('functions/confirmLoggedIn.php');
